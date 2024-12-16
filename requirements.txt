@@ -1,0 +1,10 @@
+streamlit
+pandas
+streamlit-aggrid
+scikit-learn
+pygwalker
+plotly
+matplotlib
+bokeh==2.4.3
+numpy<2
+seaborn
