@@ -367,7 +367,7 @@ def app(dev_mode):
 
             with col2:
                 st.subheader("正解データ")
-                answer_file = st.file_uploader("Competitionサイトで公開された正解データファイル(PBL05((工数予測))_演習03_解答.csv)をアップロード", type="csv")
+                answer_file = st.file_uploader("Competitionサイトで公開された正解データファイル(PBL05((工数予測))_演習03_解答.csv or ans.csv)をアップロード", type="csv")
 
             with col3:
                 st.subheader("投稿データ")
