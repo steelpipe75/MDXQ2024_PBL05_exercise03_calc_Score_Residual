@@ -61,6 +61,7 @@ def calc_score(y : pd.Series, y_hat : pd.Series, name : str):
 def calculate_statistics(df: pd.DataFrame, column_name: str) -> pd.Series:
     statistics = df[column_name].describe() # 基本統計量
     statistics['var'] = df[column_name].var() # 分散
+    statistics['平均予測誤差(時間/月)'] = (np.abs(df[column_name])).sum() / (6.5 * 60)
 
     return statistics.to_dict()
 
@@ -84,6 +85,7 @@ def score_series_helper(statistics, mae, rmse, rmsle, name):
                 "評価値 MAE", "評価値 RMSE(参考)", "評価値 RMSLE(参考)",
                 "残差 平均値", "残差 標準偏差", "残差 分散",
                 "残差 最小値", "残差 第1四分位数(25%)", "残差 中央値(第2四分位数,50%)", "残差 第3四分位数(75%)", "残差 最大値",
+                "平均予測誤差(時間/月)",
     ])
 
     return df_score_reindex
@@ -490,9 +492,71 @@ def app(dev_mode):
             score_awt_p8,
         ], axis=1)
 
+        score_for_ex05 = pd.DataFrame(
+            {
+                "グルアー" : {
+                    "正味" : score_nwt_g["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_g["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_g["平均予測誤差(時間/月)"] + score_awt_g["平均予測誤差(時間/月)"]
+                },
+                "印刷機" : {
+                    "正味" : score_nwt_p["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p["平均予測誤差(時間/月)"] + score_awt_p["平均予測誤差(時間/月)"]
+                },
+                "計" : {
+                    "正味" : score_nwt["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt["平均予測誤差(時間/月)"],
+                    "合計" : score_all["平均予測誤差(時間/月)"]
+                },
+            }
+        )
+
+        score_for_ex05_p = pd.DataFrame(
+            {
+                "2号機" : {
+                    "正味" : score_nwt_p2["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p2["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p2["平均予測誤差(時間/月)"] + score_awt_p2["平均予測誤差(時間/月)"]
+                },
+                "4号機" : {
+                    "正味" : score_nwt_p4["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p4["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p4["平均予測誤差(時間/月)"] + score_awt_p4["平均予測誤差(時間/月)"]
+                },
+                "6号機" : {
+                    "正味" : score_nwt_p6["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p6["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p6["平均予測誤差(時間/月)"] + score_awt_p6["平均予測誤差(時間/月)"]
+                },
+                "7号機" : {
+                    "正味" : score_nwt_p7["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p7["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p7["平均予測誤差(時間/月)"] + score_awt_p7["平均予測誤差(時間/月)"]
+                },
+                "8号機" : {
+                    "正味" : score_nwt_p8["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p8["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p8["平均予測誤差(時間/月)"] + score_awt_p8["平均予測誤差(時間/月)"]
+                },
+                "印刷機 計" : {
+                    "正味" : score_nwt_p["平均予測誤差(時間/月)"],
+                    "付帯" : score_awt_p["平均予測誤差(時間/月)"],
+                    "合計" : score_nwt_p["平均予測誤差(時間/月)"] + score_awt_p["平均予測誤差(時間/月)"]
+                },
+            }
+        )
+
         # ---- AAA 計算処理 AAA ----
 
         dowunload_csv = "PBL05 演習03 評価値/残差 計算\n"
+        dowunload_csv += "\n"
+        dowunload_csv += "全体\n"
+        dowunload_csv += score_for_ex05.T.to_csv()
+        dowunload_csv += "\n"
+        dowunload_csv += "印刷機 詳細\n"
+        dowunload_csv += score_for_ex05_p.T.to_csv()
+        dowunload_csv += "\n"
         dowunload_csv += "評価値/残差 データ\n"
         dowunload_csv += score_concat_df.to_csv()
         dowunload_csv += "\n"
@@ -515,9 +579,36 @@ def app(dev_mode):
             mime='text/csv',
         )
 
+        ex05_expander = st.expander("演習05用誤差情報", expanded=False)
         eval_expander = st.expander("評価値/残差統計情報", expanded=False)
         detail_expander = st.expander("残差詳細情報", expanded=False)
         graph_expander = st.expander("グラフ", expanded=False)
+
+        with ex05_expander:
+            select_ex05_mode = st.radio(
+                label="演習05用誤差情報 モード選択",
+                options=[
+                    RADIO_EVAL_NONE,
+                    RADIO_EVAL_TABLE,
+                    RADIO_EVAL_DF,
+                ],
+                horizontal=True,
+                label_visibility="hidden"
+            )
+
+            if select_ex05_mode == RADIO_EVAL_TABLE:
+                st.header("演習05用誤差情報")
+                st.subheader("全体")
+                st.table(score_for_ex05.T)
+                st.subheader("印刷機 詳細")
+                st.table(score_for_ex05_p.T)
+
+            if select_ex05_mode == RADIO_EVAL_DF:
+                st.header("演習05用誤差情報")
+                st.subheader("全体")
+                st.dataframe(score_for_ex05.T)
+                st.subheader("印刷機 詳細")
+                st.dataframe(score_for_ex05_p.T)
 
         with eval_expander:
             select_eval_mode = st.radio(
