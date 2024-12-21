@@ -26,7 +26,7 @@ NOMAL_TYPE = "通常モード"
 
 RADIO_EVAL_NONE = "評価値/残差 表示しない"
 RADIO_EVAL_TABLE = "評価値/残差 データ表(Streamlit標準 表形式)"
-RADIO_EVAL_DF =  "評価値/残差 データ表(Streamlit標準 DataFrame形式)", 
+RADIO_EVAL_DF =  "評価値/残差 データ表(Streamlit標準 DataFrame形式)"
 
 RADIO_DETAIL_NONE = "詳細データ 表示しない"
 RADIO_DETAIL_TABLE = "詳細データ(Streamlit標準 表形式)"
