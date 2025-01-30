@@ -184,7 +184,7 @@ def altair_helper_sub(title: str, y_pred, y_true):
         title=f'Predicted vs Actual Scatter Plot {title}',
         width=700,
         height=600
-    )
+    ).interactive()
 
     # Y = X の直線を作成
     line_data = pd.DataFrame({
@@ -223,7 +223,7 @@ def altair_hist_helper(df, column_name, title):
         y='independent'
     ).properties(
         title=f"残差 ヒストグラム & KDE ({title})"
-    )
+    ).interactive()
 
     return chart
 
